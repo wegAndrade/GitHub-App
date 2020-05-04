@@ -14,12 +14,18 @@ class App extends Component {
     }
   }
 
+  getGitHubApiUrl (username, type) {
+    const internalUser = username ? `${username}` : ''
+    const internalType = type ? `/${type}` : ''
+    return `https://api.github.com/users/${internalUser}${internalType}`
+  }
+
   handleSearch (e) {
     const value = e.target.value
     const keyCode = e.which || e.keyCode
     const ENTER = 13
     if (keyCode === ENTER) {
-      ajax().get(`https://api.github.com/users/${value}`)
+      ajax().get(this.getGitHubApiUrl(value))
         .then((result) => {
           this.setState({
             userInfo: {
@@ -29,7 +35,9 @@ class App extends Component {
               repos: result.public_repos,
               followers: result.followers,
               following: result.following
-            }
+            },
+            repos: [],
+            starred: []
           })
         })
     }
@@ -37,7 +45,7 @@ class App extends Component {
 
   getRepos (type) {
     return (e) => {
-      ajax().get(`https://api.github.com/users/${this.state.userInfo.login}/${type}`)
+      ajax().get(this.getGitHubApiUrl(this.state.userInfo.login, type))
         .then((result) => {
           console.log(this.state.userInfo.login)
           console.log(result)
@@ -68,12 +76,3 @@ class App extends Component {
 }
 
 export default App
-
-//  userInfo: {
-//         username: 'Wellington de Andrade Silva',
-//         photo: 'https://avatars1.githubusercontent.com/u/46503357?v=4',
-//         login: 'iTzweg',
-//         repos: 3,
-//         followers: 100,
-//         following: 100
-//       }
